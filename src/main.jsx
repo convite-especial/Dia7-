@@ -13,8 +13,8 @@ function Person({x,shirt='#e7a4a8',hair='#3d2829',phase=0,progress=0}){
   useFrame(({clock})=>{
     if(!group.current)return;
     const t=clock.getElapsedTime();
-    group.current.position.y = Math.abs(Math.sin(t*4+phase))*.07 + (progress>.27&&progress<.31 ? Math.sin((progress-.27)/.04*Math.PI)*.55:0);
-    group.current.rotation.z = Math.sin(t*2+phase)*.035;
+    group.current.position.y = Math.abs(Math.sin(t*(5+progress*3)+phase))*(progress>.08?.11:.04) + (progress>.43&&progress<.46 ? Math.sin((progress-.43)/.03*Math.PI)*.4:0);
+    group.current.rotation.z = Math.sin(t*4+phase)*.045;
     group.current.rotation.y = Math.sin(t*.8+phase)*.09;
   });
   return <group ref={group} position={[x,0,0]}>
@@ -36,8 +36,8 @@ function Rain({enabled}){
 function World({progress,rain}){
   const scene=useRef();
   useFrame(({camera})=>{camera.position.x=THREE.MathUtils.lerp(camera.position.x,Math.sin(progress*Math.PI*3)*.35,.035);camera.lookAt(0,.8,0)});
-  const together=clamp((progress-.19)/.19);
-  const himX=-1.55+together*.9, herX=1.55-together*.9;
+  const together=clamp((progress-.10)/.28);
+  const running=Math.sin(progress*10*Math.PI)*.25; const himX=-1.35+together*.65+running, herX=1.35-together*.65+running;
   return <>
     <color attach="background" args={[progress>.72?'#26344b':'#101a2a']}/>
     <fog attach="fog" args={['#101a2a',8,22]}/>
@@ -47,9 +47,9 @@ function World({progress,rain}){
     <mesh position={[0,-.2,0]} receiveShadow><cylinderGeometry args={[6,6,.28,64]}/><meshStandardMaterial color="#253248" roughness={.94}/></mesh>
     <mesh position={[-3.1,1.3,-1]}><cylinderGeometry args={[.045,.06,2.6,12]}/><meshStandardMaterial color="#3d4151"/></mesh>
     <mesh position={[-3.1,2.62,-1]}><sphereGeometry args={[.2,16,16]}/><meshStandardMaterial color="#ffcf87" emissive="#ffad4d" emissiveIntensity={2.2}/></mesh>
-    <Person x={himX} shirt="#6e9cc3" hair="#29242b" progress={progress}/>
-    <Person x={herX} shirt="#d9919e" hair="#442b2b" phase={1} progress={progress}/>
-    {progress>.33&&progress<.62&&<group position={[0,.25,-.5]}><mesh><cylinderGeometry args={[.75,.75,.08,32]}/><meshStandardMaterial color="#a16e56"/></mesh><mesh position={[0,-.42,0]}><cylinderGeometry args={[.07,.07,.8,12]}/><meshStandardMaterial color="#a16e56"/></mesh>{[-.26,.26].map((x,i)=><group key={i} position={[x,.17,0]}><mesh><cylinderGeometry args={[.12,.09,.25,16]}/><meshStandardMaterial color={i?'#efb5cb':'#e5c5a4'}/></mesh><mesh position={[0,.18,0]}><cylinderGeometry args={[.012,.012,.3,8]}/><meshStandardMaterial color="#f4e8d4"/></mesh></group>)}</group>}
+    <Person x={himX} shirt="#283954" hair="#29242b" progress={progress}/>
+    <Person x={herX} shirt="#943e5d" hair="#442b2b" phase={1} progress={progress}/>
+    {progress>.48&&progress<.68&&<group position={[0,.25,-.5]}><mesh><cylinderGeometry args={[.75,.75,.08,32]}/><meshStandardMaterial color="#a16e56"/></mesh><mesh position={[0,-.42,0]}><cylinderGeometry args={[.07,.07,.8,12]}/><meshStandardMaterial color="#a16e56"/></mesh>{[-.26,.26].map((x,i)=><group key={i} position={[x,.17,0]}><mesh><cylinderGeometry args={[.12,.09,.25,16]}/><meshStandardMaterial color={i?'#efb5cb':'#e5c5a4'}/></mesh><mesh position={[0,.18,0]}><cylinderGeometry args={[.012,.012,.3,8]}/><meshStandardMaterial color="#f4e8d4"/></mesh></group>)}</group>}
     {progress>.78&&<Float speed={2} floatIntensity={.4}><mesh position={[0,2.55,0]} rotation={[0,0,Math.PI/4]}><boxGeometry args={[.23,.23,.12]}/><meshStandardMaterial color="#ff839e" emissive="#ff416e" emissiveIntensity={.6}/></mesh></Float>}
     <Rain enabled={rain}/>
   </>;
@@ -63,7 +63,7 @@ return <main><div className="scene"><Canvas shadows dpr={[1,1.5]} camera={{posit
 <div className="hud"><span className="brand">✦ não foi coincidência.</span><div className="controls"><button onClick={()=>setShowRain(v=>!v)} aria-label="Alternar chuva visual" title="Chuva visual"><CloudRain size={17}/></button><button onClick={toggleRain} aria-label="Alternar som de chuva" title="Som de chuva">{rain?<Volume2 size={17}/>:<VolumeX size={17}/>}</button></div></div>
 <div className="progress-track"><div style={{width:`${progress*100}%`}}/></div>
 {!started&&<div className="welcome"><span className="tiny">07 DE DEZEMBRO DE 2026</span><h1>Uma história que<br/>não foi coincidência.</h1><p>Feita com amor, chuva e um pouquinho de milk-shake.</p><button onClick={()=>setStarted(true)}>Começar nossa história <Heart size={17}/></button><small>Para ouvir a chuva, toque no ícone de som.</small></div>}
-<div className="story" aria-hidden={!started}>{config.chapters.map((c,i)=><section key={i} className={`chapter chapter-${i}`}><div className="chapter-content"><span className="eyebrow">{c.eyebrow}</span><h2>{c.title}</h2><p>{c.text}</p>{i===0&&<span className="scroll-hint">Deslize para descobrir <ArrowDown size={16}/></span>}{i===3&&<Gallery/>}{i===4&&<div className="ending"><Heart size={30}/><strong>{finalText}</strong><span>07.12.2023 — para sempre, um dia de cada vez.</span></div>}</div></section>)}</div>
+<div className="story" aria-hidden={!started}>{config.chapters.map((c,i)=><section key={i} className={`chapter chapter-${i}`}><div className="chapter-content">{i===0&&<img className="hero-couple" src={`${import.meta.env.BASE_URL}imagens/nosso-casal.png`} alt="Ilustração 3D do casal"/>}<span className="eyebrow">{c.eyebrow}</span><h2>{c.title}</h2><p>{c.text}</p>{i===0&&<span className="scroll-hint">Deslize para descobrir <ArrowDown size={16}/></span>}{c.gallery&&<Gallery/>}{c.ending&&<div className="ending"><Heart size={30}/><strong>{finalText}</strong><span>07.12.2023 — para sempre, um dia de cada vez.</span></div>}</div></section>)}</div>
 <footer>Feito para guardar nossa história. ♥</footer></main>}
 
 createRoot(document.getElementById('root')).render(<App/>);
